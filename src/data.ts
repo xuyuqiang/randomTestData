@@ -127,7 +127,6 @@ export default [
       'Ernie Macmillan',
       'Zacharias Smith',
       'Cedric Diggory',
-      'Cedric Diggory',
     ],
   },
 ];
