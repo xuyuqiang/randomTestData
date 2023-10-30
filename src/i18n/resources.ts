@@ -13,6 +13,7 @@ const resources = {
       'About to insert n random nicknames':'即将插入{{n}}个随机昵称',
       'Insertion failed, please try again':'插入失败，请重试',
       'Inserted successfully':'插入成功',
+      'Select the field to be inserted, and after clicking Insert, the blank record will be automatically filled with a random nickname.':'选择要插入的字段，点击插入后，会自动填充空白记录为随机昵称',
     },
   },
   en: {

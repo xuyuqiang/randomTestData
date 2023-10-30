@@ -11,6 +11,7 @@ export default async function(uiBuilder: UIBuilder, { t }: UseTranslationRespons
     uiBuilder.text(t('No field type'));
     return;
   }
+  uiBuilder.markdown(t(`## ${t('Select the field to be inserted, and after clicking Insert, the blank record will be automatically filled with a random nickname.')}`));
   uiBuilder.form((form) => ({
     formItems: [
       form.select('field', 
@@ -57,7 +58,7 @@ export default async function(uiBuilder: UIBuilder, { t }: UseTranslationRespons
     for (let index = 0; index < toSetTask.length; index += step) {
       const element = toSetTask.slice(index, index + step);
       await tb.setRecords(element).then(() => {
-        console.log('执行完成');
+        // console.log('执行完成');
       }).catch((e) => {
         hasError = true;
         console.log(e);
