@@ -15,7 +15,7 @@ export default function App() {
       translation,
     });
 
-    bitable.base.onSelectionChange((selection) => {
+    const selectChange = bitable.base.onSelectionChange((selection) => {
       const tId = selection.data.tableId;
       if (currentTable.current !== tId) {
         currentTable.current = tId;
@@ -24,9 +24,11 @@ export default function App() {
     })
 
     return () => {
+      selectChange();
       uiBuilder.unmount();
     };
   }, [translation]);
+  
   return (
     <div id='container'></div>
   );
