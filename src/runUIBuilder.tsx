@@ -2,9 +2,12 @@ import { bitable, FieldType, IField, IRecordValue, ITable, UIBuilder } from "@la
 import { use } from "i18next";
 import { UseTranslationResponse } from 'react-i18next';
 import NickNameDataList from './data';
+import i18n from "./i18n";
 export default async function(uiBuilder: UIBuilder, { t }: UseTranslationResponse<'translation', undefined>) {
+  // console.log('当前语言',i18n.language);
   uiBuilder.showLoading(t('Getting data'));
   const {options,table,fieldList,nicknameList} = await initData();
+  // console.log('一共有',nicknameList.length,'个昵称');
   let nicknameListCopy = [...nicknameList];
   if (options.length === 0) {
     uiBuilder.hideLoading();
@@ -39,6 +42,7 @@ export default async function(uiBuilder: UIBuilder, { t }: UseTranslationRespons
         max:nicknameListCopy.length-1,
       })
       const n = nicknameListCopy[r];
+      // console.log('随机',r,JSON.stringify(nicknameListCopy))
       nicknameListCopy = nicknameListCopy.filter((item)=>item!==n);
       return {
         recordId,
@@ -91,9 +95,12 @@ const initData = async () => {
       label:item.name,
       value:item.id,
   }});
+  const lang = i18n.language === 'zh' ? 'zh':'en';
   let nicknameList:string[] = [];
   NickNameDataList.forEach((item)=>{
-    nicknameList = nicknameList.concat(item.list);
+    if (item.lang === lang || (!item.lang && lang === 'zh')) {
+      nicknameList = nicknameList.concat(item.list);
+    }
   },[]);
   return  {
     options,
