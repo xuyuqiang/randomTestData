@@ -1,73 +1,76 @@
-import { bitable, IField, IRecordValue, ITable, UIBuilder } from "@lark-base-open/js-sdk";
+import { bitable, FieldType, IField, IRecordValue, ITable, UIBuilder } from "@lark-base-open/js-sdk";
 import { use } from "i18next";
-import { useEffect } from "react";
 import { UseTranslationResponse } from 'react-i18next';
-import Data from './data';
+import NickNameDataList from './data';
 export default async function(uiBuilder: UIBuilder, { t }: UseTranslationResponse<'translation', undefined>) {
-  uiBuilder.markdown(`
-  ## 欢迎使用 UIBuilder
-  你可以在 \`uiBuilder.markdown\` 或者 \`uiBuilder.text\` 中输出交互内容
-  `);
+  uiBuilder.showLoading('获取数据...');
+  const {options,table,fieldList,nicknameList} = await initData();
+  let nicknameListCopy = [...nicknameList];
+  if (options.length === 0) {
+    uiBuilder.hideLoading();
+    uiBuilder.text('没有符合要求的字段类型，只能操作文本类型的字段');
+    return;
+  }
   uiBuilder.form((form) => ({
     formItems: [
-      form.tableSelect('table', { label: '选择数据表' }),
-      form.viewSelect('view', { label: '选择视图', sourceTable: 'table' }),
-      form.fieldSelect('field', { label: '选择字段', sourceTable: 'table' }),
-      // form.input('text', { label: '输入文本', defaultValue: '文本默认值' }),
-      // form.inputNumber('number', { label: '输入数字', defaultValue: 28 }),
-      // form.textArea('textArea', { label: '输入多行文本' }),
-      // form.checkboxGroup('checkbox', { label: '选择水果', options: ['Apple', 'Orange'], defaultValue: ['Apple'] }),
-      // form.select('select', { label: '下拉选择器', options: [], defaultValue: 'Apple' }),
+      form.select('field', 
+        { label: '选择字段', options: 
+        options, defaultValue: options[0].value }),
     ],
-    buttons: ['确定', '取消'],
-  }), async ({ key, values }) => {
-    const { table, view, field, text, number, textArea, checkbox, select } = values;
-    // console.log('测试--',field,typeof field);
-    const tableList = await bitable.base.getTableList();
+    buttons: ['插入'],
+  }), async ({ values }) => {
+    const { field} = values;
     const t = table as ITable;
-    const f = field as IField;
+    const f = fieldList.find(item=>item.id === field) as IField;
+    if (!f) {
+      uiBuilder.message.error(`请选择要填入的字段`);
+      return;
+    }
+    uiBuilder.showLoading(`开始执行`);
     const recordIdList = new Set((await t.getRecordIdList()));
     const fieldValueList = (await f.getFieldValueList()).map(({ record_id }) => record_id);
     fieldValueList.forEach((id) => {
       recordIdList.delete(id!)
     })
-    const toSetTask = [...recordIdList].map((recordId) => ({
-      recordId,
-      fields: {
-        [f.id]: getCellValue(),
+    const toSetTask = [...recordIdList].map((recordId) => {
+      const r = getRandomInt({
+        min:0,
+        max:nicknameListCopy.length-1,
+      })
+      const n = nicknameListCopy[r];
+      nicknameListCopy = nicknameListCopy.filter((item)=>item!==n);
+      return {
+        recordId,
+        fields: {
+          [f.id]: n,
+        }
       }
-    }))
-    console.log('我要操作的数据',toSetTask);
+    })
+    if (toSetTask.length === 0) {
+      uiBuilder.hideLoading();
+      uiBuilder.message.warning('没有需要插入的数据');
+      return;
+    }
+    uiBuilder.showLoading(`即将插入${toSetTask.length}条随机昵称`);
     const step = 5000;
+    let hasError = false;
     for (let index = 0; index < toSetTask.length; index += step) {
       const element = toSetTask.slice(index, index + step);
-      const sleep = element.length
       await t.setRecords(element).then(() => {
         console.log('执行完成');
-        // successCount += element.length;
-        // setLoadingContent(t('success.num', { num: successCount }))
-      }).catch((e) => {
-        console.error(e)
+      }).catch((...e) => {
+        hasError = true;
+        console.log(e);
       });
-      // await new Promise((resolve) => {
-      //   setTimeout(() => {
-      //     resolve('')
-      //   }, sleep);
-      // })
     }
-    uiBuilder.markdown(`你点击了**${key}**按钮`);
-
-    // const recordIdList = new Set((await view?.table.getRecordIdList()));
+    uiBuilder.hideLoading();
+    if (hasError) {
+      uiBuilder.message.error("插入失败，请重试");
+    } else {
+      uiBuilder.message.success('插入成功');
+    }
   });
-}
-
-function getCellValue() {
-  const len = Data.length;
-  const r = getRandomInt({
-    min:0,
-    max:len-1,
-  })
-  return Data[r];
+  uiBuilder.hideLoading();
 }
 
 function getRandomInt({ min, max }: { min: number, max: number }) {
@@ -76,4 +79,25 @@ function getRandomInt({ min, max }: { min: number, max: number }) {
   min = Math.ceil(_min);
   max = Math.floor(_max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+const initData = async () => {
+  const aT = await bitable.base.getActiveTable();
+  const fieldMetaList = await aT.getFieldMetaListByType(FieldType.Text);
+  const fieldList = await aT.getFieldListByType(FieldType.Text);
+  const options =  fieldMetaList.map(item=>{
+    return {
+      label:item.name,
+      value:item.id,
+  }});
+  let nicknameList:string[] = [];
+  NickNameDataList.forEach((item)=>{
+    nicknameList = nicknameList.concat(item.list);
+  },[]);
+  return  {
+    options,
+    table:aT,
+    fieldList,
+    nicknameList,
+  }
 }
