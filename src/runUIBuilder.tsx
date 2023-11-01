@@ -1,5 +1,4 @@
-import { bitable, FieldType, IField, IRecordValue, ITable, UIBuilder } from "@lark-base-open/js-sdk";
-import { use } from "i18next";
+import { bitable, FieldType, IField, ITable, UIBuilder } from "@lark-base-open/js-sdk";
 import { UseTranslationResponse } from 'react-i18next';
 import NickNameDataList from './data';
 import i18n from "./i18n";
@@ -7,6 +6,7 @@ export default async function(uiBuilder: UIBuilder, { t }: UseTranslationRespons
   // console.log('当前语言',i18n.language);
   uiBuilder.showLoading(t('Getting data'));
   const {options,table,fieldList,nicknameList} = await initData();
+  console.log('initData-end');
   // console.log('一共有',nicknameList.length,'个昵称');
   let nicknameListCopy = [...nicknameList];
   if (options.length === 0) {
@@ -31,6 +31,9 @@ export default async function(uiBuilder: UIBuilder, { t }: UseTranslationRespons
       return;
     }
     uiBuilder.showLoading(t('Begin execution'));
+    // //获取要插入数据
+    // const a = await bitable.base.getSelection();
+    // console.log('a',a);
     const recordIdList = new Set((await tb.getRecordIdList()));
     const fieldValueList = (await fd.getFieldValueList()).map(({ record_id }) => record_id);
     fieldValueList.forEach((id) => {
