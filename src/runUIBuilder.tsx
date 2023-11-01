@@ -102,11 +102,14 @@ const initData = async () => {
   console.time('getFieldListByType');
   const fieldList = await aT.getFieldListByType(FieldType.Text);
   console.timeEnd('getFieldListByType');
+  console.time('options');
   const options =  fieldMetaList.map(item=>{
     return {
       label:item.name,
       value:item.id,
   }});
+  console.timeEnd('options');
+  console.time('getNickNameList')
   const lang = i18n.language === 'zh' ? 'zh':'en';
   let nicknameList:string[] = [];
   NickNameDataList.forEach((item)=>{
@@ -114,6 +117,7 @@ const initData = async () => {
       nicknameList = nicknameList.concat(item.list);
     }
   },[]);
+  console.timeEnd('getNickNameList')
   return  {
     options,
     table:aT,
