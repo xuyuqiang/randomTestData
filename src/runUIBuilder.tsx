@@ -5,7 +5,9 @@ import i18n from "./i18n";
 export default async function(uiBuilder: UIBuilder, { t }: UseTranslationResponse<'translation', undefined>) {
   // console.log('当前语言',i18n.language);
   uiBuilder.showLoading(t('Getting data'));
+  console.time('initData');
   const {options,table,fieldList,nicknameList} = await initData();
+  console.timeEnd('initData');
   console.log('initData-end');
   // console.log('一共有',nicknameList.length,'个昵称');
   let nicknameListCopy = [...nicknameList];
@@ -90,9 +92,16 @@ function getRandomInt({ min, max }: { min: number, max: number }) {
 }
 
 const initData = async () => {
+  console.log('initData - start');
+  console.time('getActiveTable');
   const aT = await bitable.base.getActiveTable();
+  console.timeEnd('getActiveTable')
+  console.time('getFieldMetaListByType');
   const fieldMetaList = await aT.getFieldMetaListByType(FieldType.Text);
+  console.timeEnd('getFieldMetaListByType');
+  console.time('getFieldListByType');
   const fieldList = await aT.getFieldListByType(FieldType.Text);
+  console.timeEnd('getFieldListByType');
   const options =  fieldMetaList.map(item=>{
     return {
       label:item.name,
