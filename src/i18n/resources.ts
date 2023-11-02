@@ -14,6 +14,7 @@ const resources = {
       'Insertion failed, please try again':'插入失败，请重试',
       'Inserted successfully':'插入成功',
       'Select the field to be inserted, and after clicking Insert, the blank record will be automatically filled with a random nickname.':'选择要插入的字段，点击插入后，会自动填充空白记录为随机昵称',
+      'nicknamesource':'昵称来源',
     },
   },
   en: {
@@ -24,6 +25,7 @@ const resources = {
       'No field type':'There is no field type that meets the requirements, and only text type fields can be operated.',
       'No data':'No data to insert',
       'About to insert n random nicknames':'About to insert {{n}} random nicknames',
+      'nicknamesource':'source',
     },
   },
 };
