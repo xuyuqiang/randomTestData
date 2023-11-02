@@ -6,7 +6,7 @@ import {
   UIBuilder,
 } from '@lark-base-open/js-sdk';
 import { UseTranslationResponse } from 'react-i18next';
-import NickNameDataList from './data';
+import NickNameDataList,{NicknamePrefix} from './data';
 import i18n from './i18n';
 export default async function (
   uiBuilder: UIBuilder,
@@ -47,32 +47,32 @@ export default async function (
           multiple:true,
           defaultValue: sourceOptions[0].value,
         }),
+        form.checkboxGroup('prefix', { label: '名字前缀', options: ['有'], defaultValue: ['有'] }),
+        form.checkboxGroup('overwrite', { label: '覆盖已有数据', options: ['覆盖'], defaultValue: [] }),
       ],
       buttons: [t('Insert')],
     }),
     async ({ values }) => {
-      const { field, source } = values;
-      // console.log('结果',source);
+      const { field, source,overwrite,prefix } = values;
       const ss = (source || []) as string[];
       const tb = table as ITable;
+      const isOverwrite = overwrite && (overwrite as any).length > 0;
+      const isPrefix = prefix && (prefix as any).length > 0;
       const fd = fieldList.find((item) => item.id === field) as IField;
       if (!fd) {
         uiBuilder.message.error(t('Please select the fields to fill in'));
         return;
       }
       uiBuilder.showLoading(t('Begin execution'));
-      // //获取要插入数据
-      // const a = await bitable.base.getSelection();
-      // uiBuilder.hideLoading();
-      // console.log('a',a);
-      // return;
       const recordIdList = new Set(await tb.getRecordIdList());
-      const fieldValueList = (await fd.getFieldValueList()).map(
-        ({ record_id }) => record_id
-      );
-      fieldValueList.forEach((id) => {
-        recordIdList.delete(id!);
-      });
+      if (!isOverwrite) {
+        const fieldValueList = (await fd.getFieldValueList()).map(
+          ({ record_id }) => record_id
+        );
+        fieldValueList.forEach((id) => {
+          recordIdList.delete(id!);
+        });
+      }
       let nickList: any = [];
       nicknameList.forEach((item) => {
         if (ss.includes('all')) {
@@ -82,17 +82,17 @@ export default async function (
         }
       });
       const toSetTask = [...recordIdList].map((recordId) => {
-        const r = getRandomInt({
-          min: 0,
-          max: nickList.length - 1,
-        });
-        const n = nickList[r];
-        // console.log('随机',r,JSON.stringify(nicknameListCopy))
-        // nicknameListCopy = nicknameListCopy.filter((item)=>item!==n);
+
+        let prefixText = '';
+        if (isPrefix) {
+          prefixText = getRandomText(NicknamePrefix) + "的";
+        }
+        const name = getRandomText(nickList);
+        
         return {
           recordId,
           fields: {
-            [fd.id]: n,
+            [fd.id]: prefixText + name,
           },
         };
       });
@@ -184,8 +184,10 @@ const initData = async () => {
   };
 };
 
-const getSourceALLText = (source: string) => {
-  if (source === 'all') {
-    return i18n.language === 'zh' ? '全部' : 'ALL';
-  }
+const getRandomText = (list:string[]) => {
+  const r = getRandomInt({
+    min: 0,
+    max: list.length - 1,
+  });
+  return list[r] || '';
 };
