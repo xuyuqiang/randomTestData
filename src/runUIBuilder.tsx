@@ -35,7 +35,9 @@ export default async function(uiBuilder: UIBuilder, { t }: UseTranslationRespons
     uiBuilder.showLoading(t('Begin execution'));
     // //获取要插入数据
     // const a = await bitable.base.getSelection();
+    // uiBuilder.hideLoading();
     // console.log('a',a);
+    // return;
     const recordIdList = new Set((await tb.getRecordIdList()));
     const fieldValueList = (await fd.getFieldValueList()).map(({ record_id }) => record_id);
     fieldValueList.forEach((id) => {
@@ -48,7 +50,7 @@ export default async function(uiBuilder: UIBuilder, { t }: UseTranslationRespons
       })
       const n = nicknameListCopy[r];
       // console.log('随机',r,JSON.stringify(nicknameListCopy))
-      nicknameListCopy = nicknameListCopy.filter((item)=>item!==n);
+      // nicknameListCopy = nicknameListCopy.filter((item)=>item!==n);
       return {
         recordId,
         fields: {
