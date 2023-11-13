@@ -6,7 +6,7 @@ import {
   UIBuilder,
 } from '@lark-base-open/js-sdk';
 import { UseTranslationResponse } from 'react-i18next';
-import NickNameDataList,{NicknamePrefix} from './data';
+import NickNameDataList, { NicknamePrefix } from './data';
 import i18n from './i18n';
 export default async function (
   uiBuilder: UIBuilder,
@@ -34,8 +34,8 @@ export default async function (
     )
   );
   uiBuilder.form(
-    (form) => ({
-      formItems: [
+    (form) => {
+      const formItems:any = [
         form.select('field', {
           label: t('Field'),
           options: options,
@@ -44,16 +44,29 @@ export default async function (
         form.select('source', {
           label: t('nicknamesource'),
           options: sourceOptions,
-          multiple:true,
+          multiple: true,
           defaultValue: sourceOptions[0].value,
-        }),
-        form.checkboxGroup('prefix', { label: '名字前缀', options: ['有'], defaultValue: ['有'] }),
-        form.checkboxGroup('overwrite', { label: '覆盖已有数据', options: ['覆盖'], defaultValue: [] }),
-      ],
-      buttons: [t('Insert')],
-    }),
+        })
+      ]
+      if (isCN()) {
+        formItems.push(form.checkboxGroup('prefix', {
+          label: t('prefix'),
+          options: [t('exist')],
+          defaultValue: [t('exist')],
+        }))
+      }
+      formItems.push(form.checkboxGroup('overwrite', {
+        label: t('Overwrite existing data'),
+        options: [t('cover')],
+        defaultValue: [],
+      }))
+      return {
+        formItems,
+        buttons: [t('Insert')],
+      };
+    },
     async ({ values }) => {
-      const { field, source,overwrite,prefix } = values;
+      const { field, source, overwrite, prefix } = values;
       const ss = (source || []) as string[];
       const tb = table as ITable;
       const isOverwrite = overwrite && (overwrite as any).length > 0;
@@ -82,13 +95,12 @@ export default async function (
         }
       });
       const toSetTask = [...recordIdList].map((recordId) => {
-
         let prefixText = '';
         if (isPrefix) {
-          prefixText = getRandomText(NicknamePrefix) + "的";
+          prefixText = getRandomText(NicknamePrefix) + '的';
         }
         const name = getRandomText(nickList);
-        
+
         return {
           recordId,
           fields: {
@@ -157,11 +169,11 @@ const initData = async () => {
   });
   console.timeEnd('options');
   console.time('getNickNameList');
-  const lang = i18n.language === 'zh' ? 'zh' : 'en';
+  const lang = isCN() ? 'zh' : 'en';
   let nicknameList: any[] = [];
   const sourceOptions: any[] = [
     {
-      label: i18n.language === 'zh' ? '全部' : 'ALL',
+      label: isCN() ? '全部' : 'ALL',
       value: 'all',
     },
   ];
@@ -184,10 +196,14 @@ const initData = async () => {
   };
 };
 
-const getRandomText = (list:string[]) => {
+const getRandomText = (list: string[]) => {
   const r = getRandomInt({
     min: 0,
     max: list.length - 1,
   });
   return list[r] || '';
+};
+
+const isCN = () => {
+  return i18n.language === 'zh';
 };
