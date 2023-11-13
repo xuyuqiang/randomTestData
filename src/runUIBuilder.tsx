@@ -7,6 +7,7 @@ import {
 } from '@lark-base-open/js-sdk';
 import { UseTranslationResponse } from 'react-i18next';
 import NickNameDataList, { NicknamePrefix } from './data';
+import ENNickNameDataList from './en_data';
 import i18n from './i18n';
 export default async function (
   uiBuilder: UIBuilder,
@@ -170,22 +171,19 @@ const initData = async () => {
   console.timeEnd('options');
   console.time('getNickNameList');
   const lang = isCN() ? 'zh' : 'en';
-  let nicknameList: any[] = [];
+  const nicknameList = isCN() ? NickNameDataList : ENNickNameDataList;
   const sourceOptions: any[] = [
     {
       label: isCN() ? '全部' : 'ALL',
       value: 'all',
     },
   ];
-  NickNameDataList.forEach((item) => {
-    if (item.lang === lang || (!item.lang && lang === 'zh')) {
-      nicknameList.push(item);
-      sourceOptions.push({
-        label: item.source,
-        value: item.source,
-      });
-    }
-  }, []);
+  nicknameList.forEach((item) => {
+    sourceOptions.push({
+      label: item.source,
+      value: item.source,
+    });
+   });
   console.timeEnd('getNickNameList');
   return {
     options,
