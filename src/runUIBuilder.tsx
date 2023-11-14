@@ -7,6 +7,7 @@ import {
 } from '@lark-base-open/js-sdk';
 import { UseTranslationResponse } from 'react-i18next';
 import NickNameDataList, { NicknamePrefix } from './data';
+import WeaponryDataList from './tool_data';
 import ENNickNameDataList from './en_data';
 import i18n from './i18n';
 export default async function (
@@ -55,6 +56,11 @@ export default async function (
           options: [t('exist')],
           defaultValue: [t('exist')],
         }))
+        formItems.push(form.checkboxGroup('weaponry', {
+          label: t('weaponry'),
+          options: [t('exist')],
+          defaultValue: [t('exist')],
+        }))
       }
       formItems.push(form.checkboxGroup('overwrite', {
         label: t('Overwrite existing data'),
@@ -67,11 +73,12 @@ export default async function (
       };
     },
     async ({ values }) => {
-      const { field, source, overwrite, prefix } = values;
+      const { field, source, overwrite, prefix,weaponry } = values;
       const ss = (source || []) as string[];
       const tb = table as ITable;
       const isOverwrite = overwrite && (overwrite as any).length > 0;
       const isPrefix = prefix && (prefix as any).length > 0;
+      const isWeaponry = weaponry && (weaponry as any).length > 0;
       const fd = fieldList.find((item) => item.id === field) as IField;
       if (!fd) {
         uiBuilder.message.error(t('Please select the fields to fill in'));
@@ -96,16 +103,19 @@ export default async function (
         }
       });
       const toSetTask = [...recordIdList].map((recordId) => {
-        let prefixText = '';
+        let nickname = '';
         if (isPrefix) {
-          prefixText = getRandomText(NicknamePrefix) + '的';
+          nickname += getRandomText(NicknamePrefix) + '的';
         }
-        const name = getRandomText(nickList);
-
+        nickname += getRandomText(nickList);
+        if (isWeaponry) {
+          nickname += getRandomText(WeaponryDataList);
+        }
+        
         return {
           recordId,
           fields: {
-            [fd.id]: prefixText + name,
+            [fd.id]: nickname,
           },
         };
       });

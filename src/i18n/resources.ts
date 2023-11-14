@@ -18,7 +18,8 @@ const resources = {
       'prefix':'名字前缀',
       'exist':'有',
       'cover':'覆盖',
-      'Overwrite existing data':'覆盖已有数据'
+      'Overwrite existing data':'覆盖已有数据',
+      'weaponry':'兵器',
     },
   },
   en: {
