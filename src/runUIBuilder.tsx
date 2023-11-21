@@ -16,7 +16,7 @@ export default async function (
   uiBuilder.showLoading(t('Getting data'));
   console.time('initData');
   const { options, table, fieldList,dataTypeOptions} =
-    await initData();
+    await initData({t});
   console.timeEnd('initData');
   console.log('initData-end');
   // console.log('一共有',nicknameList.length,'个昵称');
@@ -26,13 +26,7 @@ export default async function (
     uiBuilder.text(t('No field type'));
     return;
   }
-  uiBuilder.markdown(
-    t(
-      `## ${t(
-        'Select the field to be inserted, and after clicking Insert, the blank record will be automatically filled with a random nickname.'
-      )}`
-    )
-  );
+  uiBuilder.markdown(`## ${t('title')}`);
   uiBuilder.form(
     (form) => {
       const formItems:any = [
@@ -121,15 +115,7 @@ export default async function (
   uiBuilder.hideLoading();
 }
 
-function getRandomInt({ min, max }: { min: number; max: number }) {
-  const _max = Math.max(min, max);
-  const _min = Math.min(min, max);
-  min = Math.ceil(_min);
-  max = Math.floor(_max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-const initData = async () => {
+const initData = async ({t}:any) => {
   console.log('initData - start');
   console.time('getActiveTable');
   const aT = await bitable.base.getActiveTable();
@@ -154,14 +140,14 @@ const initData = async () => {
     table: aT,
     fieldList,
     dataTypeOptions:[{
-      label:'手机号',
+      label:t('Mobile'),
       value:'mobile',
     },{
-      label:'姓名',
+      label:t('Name'),
       value:'name'
     },
     {
-      label:'身份证号',
+      label:t('IdCard'),
       value:'idCard'
     }
     ]

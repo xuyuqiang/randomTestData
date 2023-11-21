@@ -2,8 +2,11 @@ const resources = {
   zh: {
     translation: {
       // 定义你的中文文案
-      'Welcome to UIBuilder': '欢迎使用 UIBuilder',
-      'dataType':'数据类型',
+      'title':'选择要插入的字段+数据类型，点击插入后，会自动填充记录',
+      'dataType':'随机类型',
+      'Mobile':'手机号码',
+      'Name':'姓名',
+      'IdCard':'身份证号码',
       'Getting data':'获取数据中...',
       'No field type':'没有符合要求的字段类型，只能操作文本类型的字段',
       'No data':'没有位置可以插入数据',
@@ -26,6 +29,7 @@ const resources = {
   en: {
     translation: {
       // Define your English text
+      'title':'Select the field + data type to be inserted. After clicking insert, the record will be automatically populated.',
       'Welcome to UIBuilder': 'Welcome to UIBuilder',
       'Getting data':'Getting data...',
       'No field type':'There is no field type that meets the requirements, and only text type fields can be operated.',
