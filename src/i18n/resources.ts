@@ -3,6 +3,7 @@ const resources = {
     translation: {
       // 定义你的中文文案
       'Welcome to UIBuilder': '欢迎使用 UIBuilder',
+      'dataType':'数据类型',
       'Getting data':'获取数据中...',
       'No field type':'没有符合要求的字段类型，只能操作文本类型的字段',
       'No data':'没有位置可以插入数据',
