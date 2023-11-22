@@ -88,7 +88,7 @@ export default async function (
         return;
       }
       uiBuilder.showLoading(
-        t('About to insert n random nicknames', { n: toSetTask.length })
+        t('About to insert n random data', { n: toSetTask.length })
       );
       const step = 5000;
       let hasError = false;
